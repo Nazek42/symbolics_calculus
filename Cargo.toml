@@ -1,0 +1,7 @@
+[package]
+name = "symbolics_calculus"
+version = "0.1.0"
+authors = ["Benjamin Kulas <nazekthetweaker@gmail.com>"]
+
+[dependencies]
+symbolics_core = "0.1.2"
