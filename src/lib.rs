@@ -1,6 +1,6 @@
-#[macro_use]
 extern crate symbolics_core;
 use symbolics_core::Expr;
+use symbolics_core::{s, apply};
 
 trait Derivative {
     fn deriv1(self, &'static str) -> Self;
@@ -16,7 +16,6 @@ impl Derivative for Expr {
             Mul(a, b) => a.clone().deriv1(wrt)**b.clone() + *a.clone()*b.clone().deriv1(wrt),
             Pow(a, b) => (*a.clone()^*b.clone()) * (a.clone().ln()*b.clone().deriv1(wrt) + (*b.clone()*a.clone().deriv1(wrt)/(*a.clone()))),
             Log(a, b) => a.clone().deriv1(wrt) / (*a.clone() * b.ln()),
-            Neg(x) => -x.deriv1(wrt),
             Sin(x) => x.clone().cos() * x.clone().deriv1(wrt),
             Cos(x) => -x.clone().sin() * x.clone().deriv1(wrt),
             Arcsin(x) => x.clone().deriv1(wrt) / (1 - (*x.clone() ^ 2)).sqrt(),
@@ -26,28 +25,25 @@ impl Derivative for Expr {
     }
 }
 
-#[macro_export]
+#[macro_use]
+mod macros {
 /// Differentiate an expression with respect to any amount of variables.
 ///
 /// # Examples
 ///
 /// To take the derivative of `y` with respect to `x`:
-/// ```
 /// diff!(y, x)
-/// ```
 ///
 /// To take the second derivative of `x` with respect to `t`:
-/// ```
 /// diff!(x, t, t)
-/// ```
 ///
 /// To take the derivative of `(s!(x) ^ 2) * (s!(y) ^ 3)` with respect to `x`, then `y`:
-/// ```
 /// diff!((s!(x) ^ 2) * (s!(y) ^ 3), x, y)
-/// ```
-macro_rules! diff {
-    ($expr:expr, $($sym:ident),+) => {
-        $expr $(.deriv1(stringify!($sym)))+
+    #[macro_export]
+    macro_rules! diff {
+        ($expr:expr, $($sym:ident),+) => {
+            $expr $(.deriv1(stringify!($sym)))+
+        }
     }
 }
 
