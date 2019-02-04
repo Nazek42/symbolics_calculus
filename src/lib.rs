@@ -3,21 +3,22 @@ use symbolics_core::Expr;
 use symbolics_core::{s, apply};
 
 trait Derivative {
-    fn deriv1(self, &'static str) -> Self;
+    fn deriv1<S: Into<String>>(self, S) -> Self;
 }
 
 impl Derivative for Expr {
-    fn deriv1(self, wrt: &'static str) -> Expr {
+    fn deriv1<S: Into<String>>(self, wrt_raw: S) -> Expr {
         use Expr::*;
+        let wrt = wrt_raw.into();
         match self {
             Num(_) => Num(0.),
             Symbol(s) => Num(if s == wrt {1.} else {0.}),
-            Add(a, b) => a.clone().deriv1(wrt) + b.clone().deriv1(wrt),
-            Mul(a, b) => a.clone().deriv1(wrt)**b.clone() + *a.clone()*b.clone().deriv1(wrt),
-            Pow(a, b) => (*a.clone()^*b.clone()) * (a.clone().ln()*b.clone().deriv1(wrt) + (*b.clone()*a.clone().deriv1(wrt)/(*a.clone()))),
-            Log(a, b) => a.clone().deriv1(wrt) / (*a.clone() * b.ln()),
-            Sin(x) => x.clone().cos() * x.clone().deriv1(wrt),
-            Cos(x) => -x.clone().sin() * x.clone().deriv1(wrt),
+            Add(a, b) => a.clone().deriv1(wrt.as_ref()) + b.clone().deriv1(wrt.as_ref()),
+            Mul(a, b) => a.clone().deriv1(wrt.as_ref())**b.clone() + *a.clone()*b.clone().deriv1(wrt.as_ref()),
+            Pow(a, b) => (*a.clone()^*b.clone()) * (a.clone().ln()*b.clone().deriv1(wrt.as_ref()) + (*b.clone()*a.clone().deriv1(wrt.as_ref())/(*a.clone()))),
+            Log(a, b) => a.clone().deriv1(wrt.as_ref()) / (*a.clone() * b.ln()),
+            Sin(x) => x.clone().cos() * x.clone().deriv1(wrt.as_ref()),
+            Cos(x) => -x.clone().sin() * x.clone().deriv1(wrt.as_ref()),
             Arcsin(x) => x.clone().deriv1(wrt) / (1 - (*x.clone() ^ 2)).sqrt(),
             Arccos(x) => -x.clone().deriv1(wrt) / (1 - (*x.clone() ^ 2)).sqrt(),
             Arctan(x) => x.clone().deriv1(wrt) / (1 + (*x.clone() ^ 2)),
