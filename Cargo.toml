@@ -7,4 +7,4 @@ repository = "https://github.com/nazek42/symbolics_calculus"
 authors = ["Benjamin Kulas <nazekthetweaker@gmail.com>"]
 
 [dependencies]
-symbolics_core = "0.1.4"
+symbolics_core = "0.1.5"
