@@ -2,7 +2,7 @@ extern crate symbolics_core;
 use symbolics_core::Expr;
 use symbolics_core::{s, apply};
 
-trait Derivative {
+pub trait Derivative {
     fn deriv1<S: Into<String>>(self, S) -> Self;
 }
 
