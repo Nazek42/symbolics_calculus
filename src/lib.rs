@@ -11,7 +11,7 @@ impl Derivative for Expr {
         use Expr::*;
         match self {
             Num(_) => Num(0.),
-            Symbol(_) => Num(1.),
+            Symbol(s) => Num(if s == wrt {1.} else {0.}),
             Add(a, b) => a.clone().deriv1(wrt) + b.clone().deriv1(wrt),
             Mul(a, b) => a.clone().deriv1(wrt)**b.clone() + *a.clone()*b.clone().deriv1(wrt),
             Pow(a, b) => (*a.clone()^*b.clone()) * (a.clone().ln()*b.clone().deriv1(wrt) + (*b.clone()*a.clone().deriv1(wrt)/(*a.clone()))),
@@ -64,4 +64,10 @@ fn trig1() {
     use symbolics_core::consts::pi;
     let y = s!(x).sin() * s!(x).cos();
     assert_eq!(apply!(diff!(y, x), x=pi()/2).val().unwrap(), -1.);
+}
+
+#[test]
+fn partial1() {
+    let z = 2*s!(x) + s!(y);
+    assert_eq!(apply!(diff!(z, x), y=5, x=0).val().unwrap(), 2.);
 }
